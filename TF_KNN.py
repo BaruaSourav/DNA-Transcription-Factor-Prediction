@@ -3,23 +3,21 @@ import csv
 ###########################
 ## Preparing the primary data set
 ###########################
-df = pd.read_csv("TF_sequences.txt",sep='\t', lineterminator='\n',header=None)
-## Preparing the X_unseen.txt and X_train.txt data
-X_unseen = df.iloc[-30:] #splitting last 30 rows for the X_unseen.txt data 
-X_unseen.to_csv("X_unseen.txt", sep="\t", header=False,index=False)
-X_train = df.iloc[:-30] #splitting first 120 rows from the sequences
-X_train.to_csv("X_train.txt", sep="\t", header=False,index=False)
+# df = pd.read_csv("TF_sequences.txt",sep='\t', lineterminator='\n',header=None)
+# ## Preparing the X_unseen.txt and X_train.txt data
+# X_unseen = df.iloc[-30:] #splitting last 30 rows for the X_unseen.txt data 
+# X_unseen.to_csv("X_unseen.txt", sep="\t", header=False,index=False)
+# X_train = df.iloc[:-30] #splitting first 120 rows from the sequences
+# X_train.to_csv("X_train.txt", sep="\t", header=False,index=False)
 
-## Preparing the Y_train.txt and Y_validation data
-df = pd.read_csv("TF_output.txt",sep='\t', lineterminator='\n')
-df.rename(columns={"Vsx1\r": "Vsx1"},inplace=True) #ughhh faulty column name
-Y_validation = df.iloc[:, -30:] 
-Y_train = df.iloc[:,:-30]
-print(Y_train.head(17))
-Y_train.to_csv("Y_train.txt", sep="\t", index=False,float_format='%.4f')
-Y_validation.to_csv("Y_validation.txt", sep="\t", index=False, float_format='%.4f')
-
-
+# ## Preparing the Y_train.txt and Y_validation data
+# df = pd.read_csv("TF_output.txt",sep='\t', lineterminator='\n')
+# df.rename(columns={"Vsx1\r": "Vsx1"},inplace=True) #ughhh faulty column name
+# Y_validation = df.iloc[:, -30:] 
+# Y_train = df.iloc[:,:-30]
+# print(Y_train.head(17))
+# Y_train.to_csv("Y_train.txt", sep="\t", index=False,float_format='%.4f')
+# Y_validation.to_csv("Y_validation.txt", sep="\t", index=False, float_format='%.4f')
 #####################################################################################
 
 
@@ -57,5 +55,8 @@ def CalculateDistance(aminoAcidSeq1, aminoAcidSeq2):
     if aminoAcidSeq1[56] != aminoAcidSeq2[56]:
         distance+=1
     return distance
-
 # print(CalculateDistance("MLRRAVFSDVQRKALEKTFQKQKYISKPDRKKLASKLGLKDSQVKIWFQNRRMKWRN","RKPRTIYSSYQLAALQRRFQKAQYLALPERAELAAQLGLTQTQVKIWFQNRRSKFKK"))
+
+X_train = pd.read_csv("X_train.txt",sep='\t', lineterminator='\n',header=None)
+Y_train = pd.read_csv("Y_train.txt",sep='\t', lineterminator='\n')
+X_unseen = pd.read_csv("X_unseen.txt",sep='\t',lineterminator='\n')
