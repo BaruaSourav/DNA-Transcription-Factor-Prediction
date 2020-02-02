@@ -1,5 +1,7 @@
 import pandas as pd 
 import csv
+import sys
+
 ###########################
 ## Preparing the primary data set
 ###########################
@@ -56,7 +58,19 @@ def CalculateDistance(aminoAcidSeq1, aminoAcidSeq2):
         distance+=1
     return distance
 # print(CalculateDistance("MLRRAVFSDVQRKALEKTFQKQKYISKPDRKKLASKLGLKDSQVKIWFQNRRMKWRN","RKPRTIYSSYQLAALQRRFQKAQYLALPERAELAAQLGLTQTQVKIWFQNRRSKFKK"))
+# print("Reading arguments")
+for args in sys.argv:
+    #print("test")
+    print(str(args))
+X_train_file_name = sys.argv[1]
+Y_train_file_name = sys.argv[2]
+X_unseen_file_name = sys.argv[3]
+X_train = pd.read_csv(X_train_file_name,sep='\t', lineterminator='\n',header=None)
+Y_train = pd.read_csv(Y_train_file_name,sep='\t', lineterminator='\n')
+X_unseen = pd.read_csv(X_unseen_file_name,sep='\t',lineterminator='\n',header=None)
 
-X_train = pd.read_csv("X_train.txt",sep='\t', lineterminator='\n',header=None)
-Y_train = pd.read_csv("Y_train.txt",sep='\t', lineterminator='\n')
-X_unseen = pd.read_csv("X_unseen.txt",sep='\t',lineterminator='\n')
+#print(X_unseen.iloc[0,1])
+#print(X_train[1])
+X_train["Distance"] = X_train.apply (lambda row: CalculateDistance(row[1],X_unseen.iloc[0,1]), axis=1 )
+CalculateDistance(X_train[1],X_unseen.iloc[0,1])
+print(X_train)
