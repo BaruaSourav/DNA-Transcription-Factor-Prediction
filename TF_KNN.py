@@ -71,6 +71,21 @@ X_unseen = pd.read_csv(X_unseen_file_name,sep='\t',lineterminator='\n',header=No
 
 #print(X_unseen.iloc[0,1])
 #print(X_train[1])
-X_train["Distance"] = X_train.apply (lambda row: CalculateDistance(row[1],X_unseen.iloc[0,1]), axis=1 )
-CalculateDistance(X_train[1],X_unseen.iloc[0,1])
-print(X_train)
+Y_predicted = pd.DataFrame()
+for index,unseen_instance in X_unseen.iterrows():
+    X_train['Distance'] = X_train.apply (lambda row: CalculateDistance(row[1],unseen_instance[1]), axis=1 )
+    #CalculateDistance(X_train[1],X_unseen.iloc[0,1])
+    X_train = X_train.sort_values(by='Distance')
+    neighbours = X_train.head(15)[0]
+    # print(neighbours.tolist())
+    Y_train.rename(columns={"Pou1f1\r": "Pou1f1"},inplace=True)
+    neighbour_vectors = Y_train[neighbours.tolist()]
+    neighbour_vectors['Mean']= neighbour_vectors.mean(axis=1)
+    #Y_predicted.index = neighbour_vectors.index
+    #Y_predicted[row[0]] = neighbour_vectors['Mean']
+    Y_predicted[unseen_instance[0]] = neighbour_vectors['Mean']
+    print(neighbour_vectors)
+    print(Y_predicted)
+Y_predicted.to_csv("Y_predicted.txt", sep="\t", index=False,float_format='%.4f')
+
+
