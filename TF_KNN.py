@@ -1,7 +1,7 @@
 import pandas as pd 
 import csv
 import sys
-
+import scipy.stats as stats
 ###########################
 ## Preparing the primary data set
 ###########################
@@ -68,24 +68,42 @@ X_unseen_file_name = sys.argv[3]
 X_train = pd.read_csv(X_train_file_name,sep='\t', lineterminator='\n',header=None)
 Y_train = pd.read_csv(Y_train_file_name,sep='\t', lineterminator='\n')
 X_unseen = pd.read_csv(X_unseen_file_name,sep='\t',lineterminator='\n',header=None)
+Y_validation = pd.read_csv('Y_validation.txt',sep='\t', lineterminator='\n')
 
 #print(X_unseen.iloc[0,1])
 #print(X_train[1])
+
 Y_predicted = pd.DataFrame()
-for index,unseen_instance in X_unseen.iterrows():
-    X_train['Distance'] = X_train.apply (lambda row: CalculateDistance(row[1],unseen_instance[1]), axis=1 )
-    #CalculateDistance(X_train[1],X_unseen.iloc[0,1])
-    X_train = X_train.sort_values(by='Distance')
-    neighbours = X_train.head(15)[0]
-    # print(neighbours.tolist())
-    Y_train.rename(columns={"Pou1f1\r": "Pou1f1"},inplace=True)
-    neighbour_vectors = Y_train[neighbours.tolist()]
-    neighbour_vectors['Mean']= neighbour_vectors.mean(axis=1)
-    #Y_predicted.index = neighbour_vectors.index
-    #Y_predicted[row[0]] = neighbour_vectors['Mean']
-    Y_predicted[unseen_instance[0]] = neighbour_vectors['Mean']
-    print(neighbour_vectors)
-    print(Y_predicted)
-Y_predicted.to_csv("Y_predicted.txt", sep="\t", index=False,float_format='%.4f')
+Y_train.rename(columns={"Pou1f1\r": "Pou1f1"},inplace=True)
+Y_validation.rename(columns={"Vsx1\r": "Vsx1"},inplace=True)
+spearmancoeff_vs_k = pd.DataFrame(columns=['k','spearmans_coeff'])
 
+for k in range(1,21): # for k = 1 to 20
+    for index,unseen_instance in X_unseen.iterrows():
+        X_train['Distance'] = X_train.apply (lambda row: CalculateDistance(row[1],unseen_instance[1]), axis=1 )
+        #CalculateDistance(X_train[1],X_unseen.iloc[0,1])
+        X_train = X_train.sort_values(by='Distance')
+        neighbours = X_train.head(k)[0]
+        # print(neighbours.tolist())
+        neighbour_vectors = Y_train[neighbours.tolist()]
+        neighbour_vectors['Mean']= neighbour_vectors.mean(axis=1)
+        #Y_predicted.index = neighbour_vectors.index
+        #Y_predicted[row[0]] = neighbour_vectors['Mean']
+        Y_predicted[unseen_instance[0]] = neighbour_vectors['Mean']
+        #print(neighbour_vectors)
+    #print(Y_predicted)
+    Y_predicted.to_csv("Y_predicted.txt", sep="\t", index=False,float_format='%.4f')
+    #print(Y_validation.columns)
+    spearmans_corel = 0
+    for tf_name in Y_predicted.columns:
+        spearmans_corel+= stats.spearmanr(Y_validation[tf_name],Y_predicted[tf_name])[0]
+        print(tf_name +'-' + str(stats.spearmanr(Y_validation[tf_name],Y_predicted[tf_name])[0]))
 
+    mean_spearmans_corel = spearmans_corel/30
+    k_v_spearmanrow = pd.DataFrame([[k ,mean_spearmans_corel]],columns=['k','spearmans_coeff'])
+    print(k_v_spearmanrow)
+    spearmancoeff_vs_k = spearmancoeff_vs_k.append(k_v_spearmanrow,ignore_index=False)
+    #print(spearmancoeff_vs_k)
+    print('Mean Spearman\'s correlation coeff (rho) for k = '+ str(k) + ' is '+ str(mean_spearmans_corel))
+    
+print(spearmancoeff_vs_k)
