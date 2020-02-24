@@ -4,6 +4,8 @@ import sys
 import numpy as np
 import decimal 
 import scipy.stats as stats
+import plotly.express as px
+import plotly.graph_objects as go
 
 def get_TP_count(class_prediction_dataframe):
     return len(class_prediction_dataframe[(class_prediction_dataframe['Predicted Class'] == 1) & (class_prediction_dataframe['Actual Class'] == 1)])
@@ -35,6 +37,37 @@ def main():
         pr_pairs = pr_pairs.append(pr_pair_row,ignore_index= True)
         print('Precision : ',precision)
         print('Recall : ', recall)
+    pr_pairs.to_csv("PR_table.txt", sep="\t",index=False,float_format="%.4f")
+    
+    ### Constructing PR Curve
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x = pr_pairs['Recall'],
+            y = pr_pairs['Precision'],
+            mode ="lines+markers",
+            line_shape='vh',
+            text='asdasd'
+        )
+    )
+    fig.update_traces(textposition='top center')
+    fig.update_layout(
+        title="Precision - Recall Curve",
+        margin=dict(l=20, r=150, t=150, b=20),
+        xaxis_title="Recall",
+        yaxis_title="Precision",
+        font=dict(
+            size=18,
+            color="#7f7f7f"
+        ),
+        width=800,
+        height=700,
+        
+    )
+
+    fig.show()
+    fig.write_image("PRC.png")
 
 
 
