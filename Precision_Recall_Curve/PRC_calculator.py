@@ -37,6 +37,7 @@ def main():
         pr_pairs = pr_pairs.append(pr_pair_row,ignore_index= True)
         print('Precision : ',precision)
         print('Recall : ', recall)
+    print("Writing PR_table.txt file....")    
     pr_pairs.to_csv("PR_table.txt", sep="\t",index=False,float_format="%.4f")
     
     ### Constructing PR Curve
@@ -65,9 +66,10 @@ def main():
         height=700,
         
     )
-
-    fig.show()
+    print("Writing the PRC.png file.....")
+    #fig.show()
     fig.write_image("PRC.png")
+    print("Successfully created the PRC.png plot file and the threshold-precision-recall table on PR_table.txt file")
 
 
 
